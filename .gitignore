@@ -12,6 +12,8 @@ src/*.kml
 *.pyo
 .DS_Store
 .Python
+pip.conf
+pip.ini
 
 # for Unix Flask
 bin/
