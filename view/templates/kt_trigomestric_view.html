@@ -1,0 +1,605 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="/static/js/three.min.js"></script>
+<script src="/static/js/OrbitControls.js"></script>
+<div class="container">
+  <h1>KT trigomestric rudder simulation View</h1>
+</div>
+<form action="kt_trigomestric" method="post" class="form-horizontal">
+<div class="container">
+  <div class="row" id="database">
+    <div class="col-md-7">
+      <h3>Simulation setting</h3>
+      <!-- Information -->
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="K">K [1/s]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="K" name="K" value="{{ K }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="T">T [s]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="T" name="T" value="{{ T }}"/>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="u0">u0 [m/s]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="u0" name="u0" value="{{ u0 }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="delta0_degree">delta0 [degree]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="delta0_degree" name="delta0_degree" value="{{ delta0_degree }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="w0_degree">&omega;0 [degree/s] </label>
+        <div class="col-sm-2">
+          <input type="text" class="form-control" id="w0_degree" name="w0_degree" value="{{ w0_degree }}"/>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="theta0_degree">theta0 [degree] </label>
+        <div class="col-sm-2">
+          <input type="text" class="form-control" id="theta0_degree" name="theta0_degree" value="{{ theta0_degree }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="x0">x0 [m]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="x0" name="x0" value="{{ x0 }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="y0">y0 [m]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="y0" name="y0" value="{{ y0 }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="psi0_degree">psi0 [degree]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="psi0_degree" name="psi0_degree" value="{{ psi0_degree }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="r0_degree">r0 [degree/s]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="r0_degree" name="r0_degree" value="{{ r0_degree }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="duration">duration [s]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="duration" name="duration" value="{{ duration }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="sampling">sampling [-]</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="sampling" name="sampling" value="{{ sampling }}"/>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-4">
+      <h3>Parameter for View</h3>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="shipL"> L </label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="shipL" name="shipL" value="{{ shipL }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="shipB"> B </label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="shipB" name="shipB" value="{{ shipB }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="shipD"> D </label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="shipD" name="shipD" value="{{ shipD }}"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="animation_speed"> Animation Speed </label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" id="animation_speed" name="animation_speed" value="{{ animation_speed }}"/>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="col-sm-offset-8 col-sm-2">
+          <button type="submit" class="btn btn-primary" id='action' name='action' value='cal'>View</button>
+        </div>
+      
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+{% if result %}
+<div id="result" class="container">
+  <h3>Result</h3>
+  <div class="row" id="kt">
+    <div class="col-md-3">
+        Time : <span id="timeS"></span><br/>
+        delta : <span id="delta"></span><br/>
+        x(calculated) : <span id="x">Generating world...</span><br/>
+        y(calculated) : <span id="y">Generating world...</span><br/>
+        psi(calculated) : <span id="psi">Generating world...</span><br/>
+        u(calculated) : <span id="u">Generating world...</span><br/>
+        r(calculated) : <span id="r">Generating world...</span><br/>
+    </div>
+    <div class="col-md-9">
+      <div id="viewer">
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+      </div>
+    </div>
+    <div id="graph">
+      <table>
+        <tr>
+          <td><div id="turning_chart" style="width: 600px; height: 500px;"></div><td>
+          <td><div id="trajectory_chart" style="width: 600px; height: 500px;"></div><td>
+        </tr>
+        <tr>
+          <td><div id="speed_chart" style="width: 600px; height: 500px;"></div><td>
+          <!--<td><div id="external_chart" style="width: 500px; height: 500px;"></div><td>-->
+        </tr>
+        <tr>
+          <td></td>
+          <td><a href="#" id="download" download="result.csv">Result(CSV) Download</a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if result %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  
+  ////////////////////////////
+  // Data preparation
+  ////////////////////////////
+  var x = 0;
+  var y = 0;
+
+  var kt = [];
+  {% for time,x in result: %}
+    one = [];
+    one.push({{time}});//0.Time
+    one.push({{x[0]}} * 180.0 / Math.PI);//1.delta
+    one.push({{x[1]}});//2.x
+    one.push({{x[2]}});//3.y
+    one.push({{x[3]}} * 180.0 / Math.PI);//4.psi
+    one.push({{x[4]}});//5.u
+    one.push({{x[5]}} * 180 / Math.PI);//6.r
+    kt.push(one);
+  {% endfor %}
+
+  /////////////////////////////////////////////////////////////////////////////////////
+  // For kt trajectory chart
+  //////////////////////////////////////////////////////////////////////////////////////
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawTrajectoryChart);
+  function drawTrajectoryChart() {
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('number', 'X');
+    dataTable.addColumn('number', 'Trajectory');
+    for(var i=0;i<kt.length;i++){
+      dataTable.addRow([kt[i][2],kt[i][3]]);
+    }
+
+    var options = {
+      //tooltip: {isHtml: true},
+      hAxis: {title: "X [m]"},
+      vAxis: {title: "Y [m]"},
+      explorer: {
+        actions: ['dragToZoom', 'rightClickToReset'],
+        keepInBounds: true,
+        maxZoomIn: 8.0
+      }
+    };
+    var chart = new google.visualization.LineChart(document.getElementById('trajectory_chart'));
+    chart.draw(dataTable, options);
+
+    var columns = [];
+    var series = {};
+    for (var i = 0; i < dataTable.getNumberOfColumns(); i++) {
+      columns.push(i);
+      if (i > 0) {
+        series[i - 1] = {};
+      }
+    }
+
+    google.visualization.events.addListener(chart, 'select', function () {
+      var sel = chart.getSelection();
+      if(sel.length > 0){
+        if (sel[0].row === null) {
+          var col = sel[0].column;
+          if (columns[col] == col) {
+            columns[col] = {
+              label: dataTable.getColumnLabel(col),
+              type: dataTable.getColumnType(col),
+              calc: function () {
+                return null;
+              }
+            };
+            series[col - 1].color = 'gray';
+          }else{
+            columns[col] = col;
+            series[col - 1].color = null;
+          }
+
+          options.series = series;
+          var view = new google.visualization.DataView(dataTable);
+          view.setColumns(columns);
+          chart.draw(view, options);
+        }
+      }
+    });
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////
+  // For kt turning chart
+  //////////////////////////////////////////////////////////////////////////////////////
+  google.charts.setOnLoadCallback(drawTurningAngularVelocityChart);
+  function drawTurningAngularVelocityChart() {
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('number', 'time');
+    dataTable.addColumn('number', '\u03B4 [degree]');
+    dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+    dataTable.addColumn('number', '\u03A8 [degree]');
+    dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+    dataTable.addColumn('number', 'r [degree/s]');
+    dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+    
+    for(var i=0;i<kt.length;i++){
+      dataTable.addRow([
+        kt[i][0],
+        kt[i][1],
+        '<p>time: '+kt[i][0]+'<br/>\u03B4: '+kt[i][1]+'<br/>\u03A8: '+kt[i][4]+'<br/>r: '+kt[i][6],
+        kt[i][4],
+        '<p>time: '+kt[i][0]+'<br/>\u03B4: '+kt[i][1]+'<br/>\u03A8: '+kt[i][4]+'<br/>r: '+kt[i][6],
+        kt[i][6],
+        '<p>time: '+kt[i][0]+'<br/>\u03B4: '+kt[i][1]+'<br/>\u03A8: '+kt[i][4]+'<br/>r: '+kt[i][6]
+      ]);
+    }
+
+    var options = {
+      tooltip: {isHtml: true},
+      hAxis: {title: "Time [s]"},
+      vAxis: {title: "[degree]"},
+      colors: ["green", "purple", "red"],
+      explorer: {
+        actions: ['dragToZoom', 'rightClickToReset'],
+        keepInBounds: true,
+        maxZoomIn: 8.0
+      }
+    };
+    
+    var chart = new google.visualization.LineChart(document.getElementById('turning_chart'));
+    chart.draw(dataTable, options);
+
+    var columns = [];
+    var series = {};
+    for (var i = 0; i < dataTable.getNumberOfColumns(); i++) {
+      columns.push(i);
+      if (i > 0) {
+        series[i - 1] = {};
+      }
+    }
+
+    google.visualization.events.addListener(chart, 'select', function () {
+      var sel = chart.getSelection();
+      if(sel.length > 0){
+        if (sel[0].row === null) {
+          var col = sel[0].column;
+          if (columns[col] == col) {
+            columns[col] = {
+              label: dataTable.getColumnLabel(col),
+              type: dataTable.getColumnType(col),
+              calc: function () {
+                return null;
+              }
+            };
+            series[col - 1].color = 'gray';
+          }else{
+            columns[col] = col;
+            series[col - 1].color = null;
+          }
+
+          options.series = series;
+          var view = new google.visualization.DataView(dataTable);
+          view.setColumns(columns);
+          chart.draw(view, options);
+        }
+      }
+    });
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////
+  // For kt speed chart
+  //////////////////////////////////////////////////////////////////////////////////////
+  google.charts.setOnLoadCallback(drawSpeedChart);
+  function drawSpeedChart() {
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('number', 'time');
+    dataTable.addColumn('number', 'Speed over ground[m/s]');
+    dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+    
+    for(var i=0;i<kt.length;i++){
+      dataTable.addRow([
+        kt[i][0],
+        kt[i][5],
+        '<p>time: '+kt[i][0]+'<br/>Speed over ground: '+kt[i][5]
+      ]);
+    }
+
+    var options = {
+      tooltip: {isHtml: true},
+      hAxis: {title: "Time [s]"},
+      vAxis: {title: "[m/s]"},
+      colors: ["green", "purple"],
+      explorer: {
+        actions: ['dragToZoom', 'rightClickToReset'],
+        keepInBounds: true,
+        maxZoomIn: 8.0
+      }
+    };
+    
+    var chart = new google.visualization.LineChart(document.getElementById('speed_chart'));
+    chart.draw(dataTable, options);
+
+    var columns = [];
+    var series = {};
+    for (var i = 0; i < dataTable.getNumberOfColumns(); i++) {
+      columns.push(i);
+      if (i > 0) {
+        series[i - 1] = {};
+      }
+    }
+
+    google.visualization.events.addListener(chart, 'select', function () {
+      var sel = chart.getSelection();
+      if(sel.length > 0){
+        if (sel[0].row === null) {
+          var col = sel[0].column;
+          if (columns[col] == col) {
+            columns[col] = {
+              label: dataTable.getColumnLabel(col),
+              type: dataTable.getColumnType(col),
+              calc: function () {
+                return null;
+              }
+            };
+            series[col - 1].color = 'gray';
+          }else{
+            columns[col] = col;
+            series[col - 1].color = null;
+          }
+
+          options.series = series;
+          var view = new google.visualization.DataView(dataTable);
+          view.setColumns(columns);
+          chart.draw(view, options);
+        }
+      }
+    });
+  }
+
+  // /////////////////////////////////////////////////////////////////////////////////////
+  // // For kt external issue chart
+  // //////////////////////////////////////////////////////////////////////////////////////
+  // google.charts.setOnLoadCallback(drawExternalIssueChart);
+  // function drawExternalIssueChart() {
+  //   var dataTable = new google.visualization.DataTable();
+  //   dataTable.addColumn('string', 'time');
+  //   dataTable.addColumn('number', 'Relative wind dir[degree]');
+  //   dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+  //   dataTable.addColumn('number', 'Relative wind speed[knot]');
+  //   dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+  //   dataTable.addColumn('number', 'True wind dir[degree]');
+  //   dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+  //   dataTable.addColumn('number', 'True wind speed[knot]');
+  //   dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+  //   dataTable.addColumn('number', 'Depth[m]');
+  //   dataTable.addColumn({'type': 'string', 'role': 'tooltip', 'p': {'html': true}});
+    
+  //   for(var i=0;i<kt.length;i++){
+  //     dataTable.addRow([
+  //       kt[i][0],
+  //       kt[i][10],
+  //       '<p>time: '+kt[i][0]+'<br/>Relative wind dir: '+kt[i][10]+'[degree]<br/>Relative wind speed: '+kt[i][11]+'<br/>True wind dir: '+kt[i][16]+'[degree]<br/>True wind speed: '+kt[i][17]+'[knot]<br/>Depth: '+kt[i][14]+'[m]',
+  //       kt[i][11],
+  //       '<p>time: '+kt[i][0]+'<br/>Relative wind dir: '+kt[i][10]+'[degree]<br/>Relative wind speed: '+kt[i][11]+'<br/>True wind dir: '+kt[i][16]+'[degree]<br/>True wind speed: '+kt[i][17]+'[knot]<br/>Depth: '+kt[i][14]+'[m]',
+  //       kt[i][16],
+  //       '<p>time: '+kt[i][0]+'<br/>Relative wind dir: '+kt[i][10]+'[degree]<br/>Relative wind speed: '+kt[i][11]+'<br/>True wind dir: '+kt[i][16]+'[degree]<br/>True wind speed: '+kt[i][17]+'[knot]<br/>Depth: '+kt[i][14]+'[m]',
+  //       kt[i][17],
+  //       '<p>time: '+kt[i][0]+'<br/>Relative wind dir: '+kt[i][10]+'[degree]<br/>Relative wind speed: '+kt[i][11]+'<br/>True wind dir: '+kt[i][16]+'[degree]<br/>True wind speed: '+kt[i][17]+'[knot]<br/>Depth: '+kt[i][14]+'[m]',
+  //       kt[i][14],
+  //       '<p>time: '+kt[i][0]+'<br/>Relative wind dir: '+kt[i][10]+'[degree]<br/>Relative wind speed: '+kt[i][11]+'<br/>True wind dir: '+kt[i][16]+'[degree]<br/>True wind speed: '+kt[i][17]+'[knot]<br/>Depth: '+kt[i][14]+'[m]'
+  //     ]);
+  //   }
+
+  //   var options = {
+  //     tooltip: {isHtml: true},
+  //     hAxis: {title: "Time [s]"},
+  //     vAxis: {title: "[degree] or [knot] or [m]"},
+  //     colors: ["green", "purple", "red", "yellow", "blue"],
+  //     explorer: {
+  //       actions: ['dragToZoom', 'rightClickToReset'],
+  //       keepInBounds: true,
+  //       maxZoomIn: 8.0
+  //     }
+  //   };
+    
+  //   var chart = new google.visualization.LineChart(document.getElementById('external_chart'));
+  //   chart.draw(dataTable, options);
+
+    // var columns = [];
+    // var series = {};
+    // for (var i = 0; i < dataTable.getNumberOfColumns(); i++) {
+    //   columns.push(i);
+    //   if (i > 0) {
+    //     series[i - 1] = {};
+    //   }
+    // }
+
+    // google.visualization.events.addListener(chart, 'select', function () {
+    //   var sel = chart.getSelection();
+    //   if(sel.length > 0){
+    //     if (sel[0].row === null) {
+    //       var col = sel[0].column;
+    //       if (columns[col] == col) {
+    //         columns[col] = {
+    //           label: dataTable.getColumnLabel(col),
+    //           type: dataTable.getColumnType(col),
+    //           calc: function () {
+    //             return null;
+    //           }
+    //         };
+    //         series[col - 1].color = 'gray';
+    //       }else{
+    //         columns[col] = col;
+    //         series[col - 1].color = null;
+    //       }
+
+    //       options.series = series;
+    //       var view = new google.visualization.DataView(dataTable);
+    //       view.setColumns(columns);
+    //       chart.draw(view, options);
+    //     }
+    //   }
+    // });
+  // }
+
+  
+  ////////////////////////////////
+  // For kt animation
+  ////////////////////////////////
+  var viewer,container,camera,scene,renderer;
+  var controls,mesh;
+  var count = 0;
+  init();
+  
+  var animationStartTime = new Date().getTime();
+  animate();
+
+  function init() {
+
+    viewer = document.getElementById('viewer');
+
+    camera = new THREE.PerspectiveCamera(60, viewer.clientWidth / viewer.clientHeight, 10, 50000);
+    camera.position.set(0, 0, 1500);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    scene = new THREE.Scene();
+    var grid = new THREE.GridHelper(50000, 500, 0xffffff, 0x00ffff);
+    grid.rotation.x = Math.PI / 2; //for x-y grid
+    scene.add(grid);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setClearColor(0x000000);
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+
+    controls = new THREE.OrbitControls(camera,renderer.domElement);
+
+    var geometry = new THREE.CubeGeometry({{shipL}},{{shipB}},{{shipD}});
+    var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    mesh = new THREE.Mesh( geometry, material );
+    scene.add( mesh );
+
+    viewer.innerHTML = "";
+    viewer.appendChild(renderer.domElement);
+
+    var axis = new THREE.AxisHelper(1000);
+    scene.add(axis)
+    axis.position.set(0,0,0)
+  }
+
+  function animate(){
+    requestAnimationFrame(animate);
+
+    var currentTime = new Date().getTime();
+    count = Math.round((currentTime - animationStartTime)/1000*{{animation_speed}});
+
+    if(count >= kt.length -1){
+      count = 0;
+    }
+
+    var timeS = kt[count][0];
+
+    // 描画(kt)
+    document.getElementById('timeS').innerHTML = timeS;
+    document.getElementById('delta').innerHTML = kt[count][1];
+    document.getElementById('x').innerHTML = kt[count][2];
+    document.getElementById('y').innerHTML = kt[count][3];
+    document.getElementById('psi').innerHTML = kt[count][4];
+    document.getElementById('u').innerHTML = kt[count][5];
+    document.getElementById('r').innerHTML = kt[count][6];
+
+    mesh.position.x = kt[count][2];
+    mesh.position.y = kt[count][3];
+    mesh.rotation.z = kt[count][4] * Math.PI / 180;
+    render();
+
+  }
+  function render() {
+    controls.update();
+    renderer.render(scene, camera);
+  }
+</script>
+{% endif %}
+
+{% if result %}
+<script type="text/javascript">
+window.onload = function(){
+  document.getElementById('download').addEventListener('click', function (e){
+    var data = "Time,RudderAngle,X,Y,HDG,u,r";
+    
+    for(let i=0; i< kt.length; i++ ){
+      data += '\r\n'+kt[i].join(',')
+    }
+
+    var array = [];
+    for (var i=0; i<data.length; i++){array.push(data.charCodeAt(i));}
+    var data = new Uint8Array(array);
+    var blob = new Blob([data] , {type: "text/csv;charset=utf-8;"});
+
+    if (window.navigator.msSaveBlob) {
+      e.preventDefault();
+      window.navigator.msSaveBlob(blob, this.getAttribute('download'));
+    } else {
+      this.href = URL.createObjectURL(blob);
+    }
+  });
+}
+</script>
+{% endif %}
+
+{% endblock %}
