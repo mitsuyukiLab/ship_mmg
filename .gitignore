@@ -1,0 +1,36 @@
+# for this application
+data/
+src/*.png
+src/*.bmp
+src/*.kml
+*.png
+*.bmp
+*.kml
+
+# for Python
+*.pyc
+*.pyo
+.DS_Store
+.Python
+
+# for Unix Flask
+bin/
+include/
+lib/
+pip-selfcheck.json
+local/
+
+# for Windows
+Scripts/
+tcl/
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# for PyChart
+.idea
+
+# for Jupyter
+.ipynb_checkpoints/
+
