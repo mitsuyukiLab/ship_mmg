@@ -15,18 +15,6 @@ This is a web-based application by using Flask and Python. Simulator is implemen
 ## Demo
 ![Interface](https://github.com/taiga4112/ship_mmg/wiki/images/demo_readme.png "Interface")
 
-## Requirement
-- Flask (0.11.1)
-- Jinja2 (2.8)
-- MarkupSafe (0.23)
-- numpy (1.11.1)
-- pip (8.1.2)
-- python (2.7.10)
-- scipy (0.17.1)
-- setuptools (24.0.2)
-- Werkzeug (0.11.10)
-- wheel (0.29.0)
-
 ## Usage
 Please asscess index page.
 
